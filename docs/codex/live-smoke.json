@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-06",
+  "platform": "win32",
+  "cli": "0.167.0-alpha.3.2",
+  "exitCode": 0,
+  "finalTokenSeen": true,
+  "observed": [
+    {
+      "status": "active",
+      "model": "",
+      "tools": []
+    },
+    {
+      "status": "active",
+      "model": "gpt-6.1-sol",
+      "tools": []
+    },
+    {
+      "status": "active",
+      "model": "gpt-6.1-sol",
+      "tools": [
+        "exec"
+      ]
+    },
+    {
+      "status": "active",
+      "model": "gpt-6.1-sol",
+      "tools": []
+    },
+    {
+      "status": "idle",
+      "model": "gpt-6.1-sol",
+      "tools": []
+    },
+    {
+      "status": "idle",
+      "model": "gpt-6.1-sol",
+      "tools": []
+    }
+  ],
+  "notes": "Fresh native Codex CLI session, read-only sandbox. No raw transcript or private paths included."
+}

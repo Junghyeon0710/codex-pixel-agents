@@ -79,7 +79,7 @@ function getActivityText(
     }
   }
 
-  return 'Idle';
+  return isActive && import.meta.env.MODE === 'codex' ? 'Working' : 'Idle';
 }
 
 function getFuelColor(ratio: number): string {

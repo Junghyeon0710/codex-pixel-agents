@@ -1,7 +1,7 @@
 {
-  "name": "Pixel Agents",
-  "short_name": "Pixel Agents",
-  "description": "Pixel art office where your Claude Code agents come to life as animated characters",
+  "name": "Codex Pixel Agents",
+  "short_name": "Codex Pixels",
+  "description": "Read-only local pixel office for Codex sessions",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1e1e2e",

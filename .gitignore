@@ -50,3 +50,7 @@ agent-orchestrator.yaml
 .ao/
 .serena/
 tasks/
+# Local Codex evidence and sessions (never publish raw transcripts)
+/codex-local/
+/.codex/
+*.jsonl

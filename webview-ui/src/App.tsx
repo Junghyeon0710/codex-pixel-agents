@@ -4,6 +4,7 @@ import { toMajorMinor } from './changelogData.js';
 import { AgentCardBar } from './components/AgentCardBar.js';
 import { BottomToolbar } from './components/BottomToolbar.js';
 import { ChangelogModal } from './components/ChangelogModal.js';
+import { CodexPanel } from './components/CodexPanel.js';
 import { ConnectionIndicator } from './components/ConnectionIndicator.js';
 import { DebugView } from './components/DebugView.js';
 import { DirectoryModal } from './components/DirectoryModal.js';
@@ -622,7 +623,8 @@ function App() {
         </Tooltip>
       )}
 
-      {officeReadOnly && (
+      {import.meta.env.MODE === 'codex' && <CodexPanel />}
+      {officeReadOnly && import.meta.env.MODE !== 'codex' && (
         <div className="absolute mobile-safe-top left-1/2 -translate-x-1/2 z-10 text-sm text-text-muted pointer-events-none select-none whitespace-nowrap">
           View only
         </div>

@@ -1,100 +1,38 @@
 {
-  "name": "pixel-agents",
-  "displayName": "Pixel Agents",
-  "description": "Pixel art office where your Claude Code agents come to life as animated characters",
-  "version": "1.5.0",
-  "publisher": "pablodelucca",
+  "name": "codex-pixel-agents",
+  "displayName": "Codex Pixel Agents",
+  "description": "A local pixel office for Codex Desktop and CLI sessions. Independent Pixel Agents adaptation.",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pixel-agents-hq/pixel-agents"
+    "url": "https://github.com/Junghyeon0710/codex-pixel-agents"
   },
   "workspaces": [
     "server",
     "webview-ui"
   ],
-  "icon": "icon.png",
   "license": "MIT",
   "engines": {
-    "node": ">=20",
-    "vscode": "^1.105.0"
+    "node": ">=22.12.0"
   },
-  "extensionKind": [
-    "workspace"
-  ],
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onStartupFinished"
-  ],
-  "main": "./dist/extension.js",
+  "main": "./dist/codex.cjs",
   "bin": {
-    "pixel-agents": "./dist/cli.js"
+    "codex-pixel-agents": "./dist/codex.cjs"
   },
   "files": [
-    "CHANGELOG.md",
     "LICENSE",
-    "dist/cli.js",
-    "dist/extension.js",
-    "dist/hooks/claude-hook.js",
-    "dist/uninstall.js",
+    "THIRD_PARTY.md",
+    "README.ko.md",
+    "dist/codex.cjs",
     "dist/assets/",
-    "dist/webview/",
-    "icon.png"
+    "dist/webview/"
   ],
-  "contributes": {
-    "commands": [
-      {
-        "command": "pixel-agents.showPanel",
-        "title": "Pixel Agents: Show Panel"
-      },
-      {
-        "command": "pixel-agents.exportDefaultLayout",
-        "title": "Pixel Agents: Export Layout as Default"
-      }
-    ],
-    "viewsContainers": {
-      "panel": [
-        {
-          "id": "pixel-agents-panel",
-          "title": "Pixel Agents",
-          "icon": "$(window)"
-        }
-      ]
-    },
-    "views": {
-      "pixel-agents-panel": [
-        {
-          "type": "webview",
-          "id": "pixel-agents.panelView",
-          "name": "Pixel Agents"
-        }
-      ]
-    },
-    "configuration": {
-      "title": "Pixel Agents",
-      "properties": {
-        "pixel-agents.autoShowPanel": {
-          "type": "boolean",
-          "default": false,
-          "description": "Automatically open and focus the Pixel Agents panel when VS Code starts."
-        },
-        "pixel-agents.autoSpawnAgent": {
-          "type": "boolean",
-          "default": false,
-          "description": "Automatically spawn a Claude Code agent when VS Code starts, if no agents are currently running."
-        }
-      }
-    }
-  },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "vscode:uninstall": "node ./dist/uninstall.js",
     "prepack": "npm run package",
     "build:extension": "node esbuild.js --production",
     "build:webview": "cd webview-ui && npm run build",
     "compile": "npm run asyncapi:generate && npm run check-types && npm run lint && node esbuild.js && npm run build:webview",
-    "build": "npm run compile",
+    "build": "node codex/build.mjs && npm run build --workspace=webview-ui -- --mode codex",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
@@ -111,7 +49,7 @@
     "test:webview": "cd webview-ui && npm test",
     "test:server": "cd server && npm test",
     "test:package-contract": "node --test scripts/npm-package-contract.test.mjs",
-    "test": "npm run test:webview && npm run test:server && npm run test:package-contract",
+    "test": "npm run test:codex",
     "verify:npm-package": "node scripts/verify-npm-package.mjs",
     "e2e": "node scripts/run-e2e.mjs",
     "e2e:debug": "node scripts/run-e2e.mjs --debug",
@@ -120,7 +58,12 @@
     "test:report:open": "allure open allure-report/allure",
     "e2e:report": "npm run test:report",
     "vercel:prepare": "npm run test:report && node scripts/assemble-vercel-output.mjs",
-    "knip": "knip"
+    "knip": "knip",
+    "build:upstream": "npm run compile",
+    "start": "node dist/codex.cjs",
+    "test:codex": "node --test codex/tests/*.test.mjs",
+    "test:codex-ui": "playwright test --config codex/playwright.config.mjs",
+    "test:upstream": "npm run test:webview && npm run test:server && npm run test:package-contract"
   },
   "devDependencies": {
     "@asyncapi/modelina": "^5.10.1",
@@ -176,5 +119,6 @@
   },
   "optionalDependencies": {
     "@lydell/node-pty": "^1.2.0-beta.12"
-  }
+  },
+  "private": true
 }

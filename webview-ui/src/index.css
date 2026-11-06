@@ -1,4 +1,59 @@
 @import 'tailwindcss';
+.codex-panel,
+.codex-panel * {
+  font-family: system-ui, sans-serif;
+}
+.codex-panel {
+  position: absolute;
+  top: 16px;
+  left: 64px;
+  z-index: 15;
+  width: min(320px, calc(100vw - 80px));
+  max-height: 40vh;
+  overflow: auto;
+  padding: 16px;
+  background: rgba(20, 24, 35, 0.94);
+  color: #e8edf6;
+  border: 1px solid #54647a;
+  box-shadow: 4px 4px 0 #111822;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.codex-title {
+  font-size: 19px;
+}
+.codex-subtitle {
+  color: #a7bacd;
+  margin: 6px 0 12px;
+}
+.codex-sessions {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+.codex-sessions li {
+  padding: 8px 0;
+  border-top: 1px solid #364254;
+}
+.codex-status {
+  color: #b5bdcc;
+}
+.codex-status[data-state='active'] {
+  color: #91ebc2;
+}
+.codex-model {
+  color: #b0c0d4;
+  font-size: 11px;
+}
+.codex-tools {
+  margin-top: 4px;
+}
+.codex-warning {
+  color: #f7cc85;
+}
+.codex-note {
+  color: #92a5b9;
+}
 /* Material Symbols Sharp, weight 700 (the single-weight package keeps the
    FILL/GRAD/opsz axes variable). Imported into the base layer: the package's
    own rules are unlayered and would otherwise outrank every Tailwind utility
