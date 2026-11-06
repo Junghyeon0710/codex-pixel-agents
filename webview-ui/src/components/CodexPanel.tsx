@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { useCodexLocale } from '../codexLocale.js';
 import { transport } from '../transport/index.js';
 
 interface Session {
@@ -12,7 +13,8 @@ interface Session {
   tools: { toolId: string; toolName: string }[];
 }
 
-export function CodexPanel() {
+export function CodexPanel({ onSelect }: { onSelect?: (id: number) => void } = {}) {
+  const { language, panelVisible, t, role } = useCodexLocale();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [received, setReceived] = useState(false);
   const [warning, setWarning] = useState('');
@@ -31,36 +33,44 @@ export function CodexPanel() {
         setWarning(
           msg.diagnostics?.skippedLargeFiles
             ? 'Some transcripts exceed the 64 MiB replay limit.'
-            : '',
+            : msg.diagnostics?.readErrors
+              ? 'Some session files could not be read.'
+              : '',
         );
-      } else if (msg.type === 'codexMonitorError')
-        setWarning(msg.message || 'Session scan failed.');
+      } else if (msg.type === 'codexMonitorError') setWarning('Session scan failed.');
     });
   }, []);
   return (
-    <aside className="codex-panel" aria-label="Codex session monitor">
+    <aside hidden={!panelVisible} className="codex-panel" aria-label={t('Codex session monitor')}>
       <strong className="codex-title">Codex Pixel Agents</strong>
-      <p className="codex-subtitle">Local session viewer · Read only</p>
+      <p className="codex-subtitle">{t('Local session viewer · Read only')}</p>
       <p aria-live="polite">
         {received
-          ? `${sessions.length} sessions · ${sessions.filter((s) => s.status === 'active').length} active`
-          : 'Connecting to local monitor…'}
+          ? language === 'ko'
+            ? `세션 ${sessions.length}개 · 작업 중 ${sessions.filter((s) => s.status === 'active').length}개`
+            : `${sessions.length} sessions · ${sessions.filter((s) => s.status === 'active').length} active`
+          : t('Connecting to local monitor…')}
       </p>
       {received && !sessions.length && (
-        <p>Start a task in Codex Desktop or CLI. Recent local sessions will appear here.</p>
+        <p>{t('Start a task in Codex Desktop or CLI. Recent local sessions will appear here.')}</p>
       )}
       <ul className="codex-sessions">
         {sessions.map((s) => (
           <li key={s.id} data-testid={`codex-session-${s.id}`}>
-            <b>
+            <button
+              type="button"
+              className="codex-session-select"
+              title={s.label}
+              onClick={() => onSelect?.(s.id)}
+            >
               {s.parentAgentId ? '↳ ' : ''}
-              {s.label}
-            </b>{' '}
+              {role(s.label)}
+            </button>{' '}
             <span className="codex-status" data-state={s.status}>
-              · {s.status}
+              · {t(s.status)}
             </span>
             <div className="codex-model">
-              {s.model || 'Model not recorded'} · {s.directoryName}
+              {s.model || t('Model not recorded')} · {s.directoryName}
             </div>
             {!!s.tools.length && (
               <div className="codex-tools">{s.tools.map((t) => t.toolName).join(', ')}</div>
@@ -70,12 +80,13 @@ export function CodexPanel() {
       </ul>
       {warning && (
         <p role="status" className="codex-warning">
-          {warning}
+          {t(warning)}
         </p>
       )}
       <small className="codex-note">
-        Activity inferred from local logs. No prompts or tool contents displayed. This viewer does
-        not assign agents.
+        {t(
+          'Activity inferred from local logs. No prompts or tool contents displayed. This viewer does not assign agents.',
+        )}
       </small>
     </aside>
   );

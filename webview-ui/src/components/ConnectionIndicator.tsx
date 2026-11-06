@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { useCodexLocale } from '../codexLocale.js';
 import { transport } from '../transport/index.js';
 import type { TransportState } from '../transport/types.js';
 
@@ -16,6 +17,7 @@ const STATE_LABELS: Partial<Record<TransportState, string>> = {
  * VersionIndicator's absolute-overlay + pixel-panel convention.
  */
 export function ConnectionIndicator() {
+  const { t } = useCodexLocale();
   const [state, setState] = useState<TransportState>(transport.state);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function ConnectionIndicator() {
   return (
     <div className="absolute mobile-safe-top left-1/2 -translate-x-1/2 z-20 pixel-panel py-6 px-12 flex items-center gap-8 text-sm">
       <span className={`w-8 h-8 rounded-full inline-block shrink-0 ${dotClass} pixel-pulse`} />
-      {label}
+      {t(label)}
     </div>
   );
 }

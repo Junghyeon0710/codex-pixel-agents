@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 
+import { useCodexLocale } from '../../codexLocale.js';
 import { Button } from '../../components/ui/Button.js';
 import {
   BUBBLE_FADE_DURATION_SEC,
@@ -122,6 +123,7 @@ export function ToolOverlay({
   onCloseAgent,
   alwaysShowOverlay,
 }: ToolOverlayProps) {
+  const { t, activity, role } = useCodexLocale();
   const [, setTick] = useState(0);
   useEffect(() => {
     let rafId = 0;
@@ -315,7 +317,7 @@ export function ToolOverlay({
                         fontWeight: ch.isTeamLead ? 'bold' : undefined,
                       }}
                     >
-                      {teamRoleLabel}
+                      {role(teamRoleLabel)}
                     </span>
                   )}
                   <span
@@ -325,7 +327,7 @@ export function ToolOverlay({
                       fontStyle: isSub ? 'italic' : undefined,
                     }}
                   >
-                    {activityText}
+                    {activity(activityText)}
                   </span>
                   {ch.directoryName && (
                     <span className="text-2xs leading-none overflow-hidden text-ellipsis block">
@@ -341,7 +343,7 @@ export function ToolOverlay({
                       e.stopPropagation();
                       onCloseAgent(id);
                     }}
-                    title="Close agent"
+                    title={t('Close agent')}
                     className="ml-2 shrink-0 leading-none"
                   >
                     ×

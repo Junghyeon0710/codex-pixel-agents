@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useCodexLocale } from '../codexLocale.js';
 import {
   ZOOM_LEVEL_FADE_DELAY_MS,
   ZOOM_LEVEL_FADE_DURATION_SEC,
@@ -15,6 +16,7 @@ interface ZoomControlsProps {
 }
 
 export function ZoomControls({ zoom, onZoomChange }: ZoomControlsProps) {
+  const { t } = useCodexLocale();
   const [showLevel, setShowLevel] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,7 +77,7 @@ export function ZoomControls({ zoom, onZoomChange }: ZoomControlsProps) {
           onClick={() => onZoomChange(zoom + 1)}
           disabled={maxDisabled}
           className="border-border! shadow-pixel disabled:hover:bg-btn-bg disabled:cursor-default disabled:opacity-(--btn-disabled-opacity)"
-          title="Zoom in (Ctrl+Scroll)"
+          title={t('Zoom in (Ctrl+Scroll)')}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <line
@@ -103,7 +105,7 @@ export function ZoomControls({ zoom, onZoomChange }: ZoomControlsProps) {
           onClick={() => onZoomChange(zoom - 1)}
           disabled={minDisabled}
           className="border-border! shadow-pixel disabled:hover:bg-btn-bg disabled:cursor-default disabled:opacity-(--btn-disabled-opacity)"
-          title="Zoom out (Ctrl+Scroll)"
+          title={t('Zoom out (Ctrl+Scroll)')}
         >
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
             <line

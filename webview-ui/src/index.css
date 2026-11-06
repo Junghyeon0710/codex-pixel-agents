@@ -1,4 +1,123 @@
 @import 'tailwindcss';
+.codex-shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.codex-office {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.codex-menubar,
+.codex-menubar * {
+  font-family: system-ui, 'Malgun Gothic', sans-serif;
+}
+.codex-menubar {
+  position: relative;
+  z-index: 50;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 2px solid #44536b;
+  background: #141823;
+  color: #e8edf6;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.codex-brand {
+  font-size: 16px;
+  white-space: nowrap;
+}
+.codex-brand span {
+  color: #91ebc2;
+  margin-right: 8px;
+}
+.codex-menubar nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.codex-menubar button,
+.codex-menubar summary,
+.codex-menubar select {
+  border: 1px solid #54647a;
+  background: #242e40;
+  color: #e8edf6;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  min-height: 34px;
+}
+.codex-menubar button:hover,
+.codex-menubar summary:hover {
+  background: #344258;
+}
+.codex-menubar button[aria-pressed='true'] {
+  border-color: #91ebc2;
+  color: #a8f1cf;
+}
+.codex-menubar :focus-visible {
+  outline: 2px solid #91ebc2;
+  outline-offset: 3px;
+}
+.codex-language {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.codex-help summary {
+  list-style: none;
+}
+.codex-help summary::-webkit-details-marker {
+  display: none;
+}
+.codex-help-content {
+  position: absolute;
+  right: 16px;
+  top: calc(100% + 8px);
+  width: min(400px, calc(100vw - 32px));
+  max-height: 60vh;
+  overflow: auto;
+  padding: 18px;
+  border: 1px solid #54647a;
+  background: #1b2332;
+  box-shadow: 4px 4px 0 #111822;
+  line-height: 1.7;
+}
+.codex-help-content p {
+  margin-top: 12px;
+}
+html[lang='ko'] .codex-office {
+  font-family: system-ui, 'Malgun Gothic', sans-serif;
+}
+@media (max-width: 600px) {
+  .codex-menubar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .codex-menubar nav {
+    gap: 6px;
+  }
+  .codex-language {
+    gap: 6px;
+  }
+  .codex-menubar button,
+  .codex-menubar summary,
+  .codex-menubar select {
+    padding: 5px 8px;
+  }
+  .codex-panel {
+    left: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-height: 32vh !important;
+  }
+}
 .codex-panel,
 .codex-panel * {
   font-family: system-ui, sans-serif;

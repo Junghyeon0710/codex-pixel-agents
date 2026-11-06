@@ -10,6 +10,8 @@ This is not an official OpenAI product and is not maintained by the upstream Pix
 
 ## Character sprites
 
+The Codex Lantern Hall uses new generated artwork in `webview-ui/public/temple/`, created for this adaptation with the built-in image-generation tool. Its background and animation atlas are distinct from the upstream office assets described below. See [artwork notes and prompts](docs/codex/TEMPLE.md).
+
 Upstream credits [MetroCity by JIK-A-4](https://jik-a-4.itch.io/metrocity-free-topdown-character-pack). Its author page identifies the pack as **CC0 1.0**. Attribution is retained with thanks. No separately sold furniture pack has been added.
 
 ## FS Pixel Sans Unicode

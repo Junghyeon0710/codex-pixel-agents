@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-06",
+  "kind": "existing-native-record-replay",
+  "platform": "win32",
+  "recencyDays": 7,
+  "sessionCount": 15,
+  "states": { "idle": 13, "interrupted": 2 },
+  "pageCounts": [8, 7],
+  "observedAppearances": ["ochre", "terracotta", "ivory", "sage", "jade", "indigo", "rose"],
+  "productionAtlasReferencesVerified": true,
+  "observedPoses": [2, 8, 9, 10],
+  "browserConsoleErrors": 0,
+  "scannerSkippedLargeFiles": 1,
+  "newAiTasksLaunched": 0,
+  "notes": "Actual local studio records rendered in the production temple. All eight appearances and active bow transitions were separately exercised with synthetic browser fixtures. No raw transcripts, native session identifiers, private paths or authentication URLs are included."
+}
