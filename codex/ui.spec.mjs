@@ -266,9 +266,24 @@ test('variable population, motion, selection, disconnect and empty hall', async 
   }
   await page.getByRole('button', { name: 'Sessions', exact: true }).click();
   await expect(page.locator('.codex-sessions li')).toHaveCount(24);
-  await page.locator('.codex-session-select').first().click();
+  // 활동 순서의 목록과 ID 순서의 배치는 다르므로 선택한 캐릭터의 실제 페이지를 확인한다.
+  const rows = page.locator('.codex-sessions li');
+  const selectedTestId = await rows.first().getAttribute('data-testid');
+  const selectedId = Number(selectedTestId.replace('codex-session-', ''));
+  const sortedIds = (
+    await rows.evaluateAll((elements) =>
+      elements.map((element) => Number(element.dataset.testid.replace('codex-session-', ''))),
+    )
+  ).sort((a, b) => a - b);
+  const selectedPage = Math.floor(sortedIds.indexOf(selectedId) / 8) + 1;
+  await page.getByTestId(selectedTestId).locator('.codex-session-select').click();
   await expect(page.getByRole('complementary', { name: 'Agent details' })).toBeVisible();
-  await expect(page.locator('.temple-page-controls')).toContainText('1 / 3');
+  await expect(page.getByTestId(`temple-agent-${selectedId}`)).toBeVisible();
+  await expect(page.getByTestId(`temple-agent-${selectedId}`)).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('.temple-page-controls')).toContainText(`${selectedPage} / 3`);
   await page.getByRole('button', { name: 'Close agent', exact: true }).click();
   await page.getByRole('button', { name: 'Sessions', exact: true }).click();
   await appendFile(

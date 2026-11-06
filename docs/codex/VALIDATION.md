@@ -12,6 +12,10 @@ Additional coverage checks genuine inactivity and expiry, unchanged session IDs,
 
 The locally installed corrected viewer displayed the ongoing native task as active. This is a live root-session observation, not a new multi-agent run. For this correction, all 17 Codex parser/server tests, backend/core TypeScript checks, the production build (including frontend TypeScript), and git diff --check passed on Windows. The existing bundle-size advisory remains non-fatal. Historical frontend and browser runs below are separate evidence, not reruns of those suites for this patch.
 
+## Activity-order selection test follow-up
+
+The timestamp correction changed list ordering to activity time. CI then exposed a test assumption: the first session-list row was expected to occupy page 1, while the hall intentionally places characters by numeric ID. The production selection code correctly navigated to page 2 for the selected character. The browser test now derives the expected page from that selected ID and verifies its visibility and selected state. All four Chromium scenarios passed locally on Windows after this test correction, using synthetic sessions in an isolated output directory.
+
 ## Publication verification: temple, localization and eight appearances
 
 The final local checkout passed 13 Codex parser/server tests, 195 retained frontend tests in 20 files, all four Chromium integration scenarios, backend/core and frontend TypeScript checks, changed-file ESLint, the production build and `git diff --check`. The existing bundle-size advisory is non-fatal. Browser fixtures cover all eight appearances in the actual hall, their work/rest transitions and the separate character gallery.
