@@ -11,6 +11,7 @@ export function newSession() {
     role: 'Codex',
     model: '',
     status: 'unknown',
+    lastActivityMs: 0,
     tools: new Map(),
   };
 }
@@ -19,6 +20,12 @@ export function newSession() {
 export function reduceRecord(s, record) {
   const p = record?.payload;
   if (!p || typeof p !== 'object') return;
+  // Windows가 열린 로그의 수정 시각을 지연해도 실제 기록 시각으로 활동을 판단한다.
+  if (['event_msg', 'response_item', 'turn_context'].includes(record.type)) {
+    const timestamp = typeof record.timestamp === 'string' ? Date.parse(record.timestamp) : NaN;
+    if (Number.isFinite(timestamp) && timestamp <= Date.now())
+      s.lastActivityMs = Math.max(s.lastActivityMs, timestamp);
+  }
   if (record.type === 'session_meta') {
     if (s.sessionId) return; // Forked history cannot replace this file's identity.
     s.sessionId = clean(p.id, 128);
@@ -91,15 +98,13 @@ export class SessionMonitor {
   async poll(now = Date.now()) {
     const candidates = [];
     await collect(this.sessionsDir, candidates);
-    const recent = candidates
-      .filter(({ info }) => now - info.mtimeMs <= this.recentMs)
-      .sort((a, b) => b.info.mtimeMs - a.info.mtimeMs)
-      .slice(0, 200);
+    const recent = candidates.sort((a, b) => b.info.mtimeMs - a.info.mtimeMs).slice(0, 200);
     this.diagnostics.candidates = recent.length;
     this.diagnostics.skippedLargeFiles = 0;
     const keep = new Set(recent.map((x) => x.file));
     for (const file of this.files.keys()) if (!keep.has(file)) this.files.delete(file);
     const sessions = new Map();
+    const activityTimes = new Map();
     for (const { file, info } of recent) {
       let cursor = this.files.get(file);
       if (
@@ -159,6 +164,9 @@ export class SessionMonitor {
         continue;
       }
       const s = cursor.state;
+      // 시작 시에도 최대 200개 후보에서 기록 시각을 확인한 뒤 표시 기간을 적용한다.
+      const lastActivity = Math.max(info.mtimeMs, Math.min(now, s.lastActivityMs));
+      if (now - lastActivity > this.recentMs) continue;
       const normalize = (v) =>
         process.platform === 'win32' ? path.resolve(v).toLowerCase() : path.resolve(v);
       if (
@@ -168,9 +176,10 @@ export class SessionMonitor {
       )
         continue;
       if (!this.ids.has(s.sessionId)) this.ids.set(s.sessionId, this.nextId++);
-      // Last activity is not proof that a process is still alive.
-      const status = s.status === 'active' && now - info.mtimeMs > 5 * 60_000 ? 'stale' : s.status;
-      if (!sessions.has(s.sessionId))
+      // 활동 기록은 프로세스 생존을 보증하지 않으며 5분 동안 기록이 없으면 오래됨으로 표시한다.
+      const status = s.status === 'active' && now - lastActivity > 5 * 60_000 ? 'stale' : s.status;
+      if (!sessions.has(s.sessionId)) {
+        activityTimes.set(s.sessionId, lastActivity);
         sessions.set(s.sessionId, {
           id: this.ids.get(s.sessionId),
           sessionId: s.sessionId,
@@ -184,11 +193,15 @@ export class SessionMonitor {
               ? [...s.tools].map(([toolId, toolName]) => ({ toolId, toolName }))
               : [],
         });
-      if (sessions.size >= this.maxAgents) break;
+      }
     }
-    const visible = [...sessions.values()];
+    // 수정 시각이 지연된 현재 작업도 실제 활동 순서로 표시 한도 안에 배치한다.
+    const visible = [...sessions.values()]
+      .sort((a, b) => activityTimes.get(b.sessionId) - activityTimes.get(a.sessionId))
+      .slice(0, this.maxAgents);
     // Keep the identity cache bounded too; IDs remain stable while a session is visible.
-    for (const id of this.ids.keys()) if (!sessions.has(id)) this.ids.delete(id);
+    const visibleIds = new Set(visible.map((s) => s.sessionId));
+    for (const id of this.ids.keys()) if (!visibleIds.has(id)) this.ids.delete(id);
     return visible.map((s) => ({ ...s, parentAgentId: this.ids.get(s.parentId) }));
   }
 }

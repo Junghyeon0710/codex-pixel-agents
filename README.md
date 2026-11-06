@@ -68,6 +68,10 @@ npm start -- --help
 
 Default input: `$CODEX_HOME/sessions`, or `~/.codex/sessions` when unset. Default port: **4877**. Default recency: **60 minutes**. Old sessions expire from view; restarting the viewer does not restart Codex.
 
+On Windows, an open session log can keep an old filesystem modification time while Codex continues appending records. The viewer also uses valid, non-future record timestamps for recency, stale detection and display priority, so these sessions remain visible and active. Logs without usable timestamps retain the filesystem-time fallback.
+
+If a project is missing, check `--workspace`: it matches one exact directory. Omit the option to watch all local projects. If another viewer already occupies the port, choose a different `--port` and open that process's newly printed URL.
+
 ## Activity and privacy
 
 | Display       | Evidence                                                         |
@@ -87,7 +91,7 @@ The server binds only to `127.0.0.1`. WebSocket access requires a random per-run
 
 - Verified with native **Codex CLI 0.167.0-alpha.3.2** on Windows and the Desktop-style local schema present during development. Transcript JSONL is an internal format and may change.
 - Cloud-only sessions or clients without accessible local JSONL are not visible.
-- Discovery scans up to four directory levels, considers 200 recent candidate files, and displays up to 24 sessions. Internal approval/guardian sessions are excluded.
+- Discovery scans up to four directory levels and considers the 200 files with the newest filesystem modification times. It checks record timestamps before applying the recency window, then displays up to 24 sessions ordered by activity. A file outside that candidate limit can still be missed. Internal approval/guardian sessions are excluded.
 - Initial replay skips files larger than 64 MiB (reported in the UI). Individual records above 2 MiB are skipped; following records continue normally.
 - Activity comes from logs, not a process heartbeat. Permission dialogs, commands hidden inside an `exec` wrapper, and exact progress percentages are not inferred.
 - The Codex viewer uses the Lantern Hall scene. A page holds up to 12 working specialists, 8 resting/waiting sessions and 2 active leads. Additional sessions appear on subsequent pages; Sessions always lists the complete discovered population (up to the backend limit of 24).
@@ -108,7 +112,7 @@ npm run test:codex-ui            # Real Chromium with synthetic sessions
 
 CI runs these checks on Windows and Ubuntu without Codex credentials or AI calls. See [validation notes](docs/codex/VALIDATION.md) for unit tests, synthetic browser tests, and the actual native Codex smoke test.
 
-The latest Windows verification passed 13 parser/server tests, 195 frontend tests and four browser scenarios, plus TypeScript, lint and the production build. A separate production viewer rendered 15 existing native studio sessions with the new character atlases; these were completed/interrupted records, not a newly running team. Active bowing and all eight appearances were checked with synthetic sessions.
+The earlier full Windows verification passed 13 parser/server tests, 195 frontend tests and four browser scenarios, plus TypeScript, lint and the production build. A separate production viewer rendered 15 existing native studio sessions with the new character atlases; these were completed/interrupted records, not a newly running team. Active bowing and all eight appearances were checked with synthetic sessions.
 
 ```text
 codex/session-monitor.mjs  JSONL reducer and incremental read-only scanner

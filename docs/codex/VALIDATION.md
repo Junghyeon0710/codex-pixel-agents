@@ -2,6 +2,16 @@
 
 Date: 2026-11-06. Local platform: Windows, Node.js 24.14.1.
 
+## Windows session-log timestamp correction
+
+A native ongoing Codex Desktop task appended current records while its JSONL file retained an approximately ten-minute-old filesystem modification time. The original viewer showed that active task as stale. This observation concerns the viewer's log handling, not the project being developed.
+
+Two synthetic regressions freeze the file modification time with `utimes`: initial discovery with a filesystem modification time outside the recency window, and incremental writes to an already discovered stale log. Both failed against upstream commit `7ac9970`: the first session was omitted and the second remained stale. The correction uses valid, non-future record timestamps alongside filesystem time, and applies recency after replay. Sessions are ranked by activity before the display limit is applied.
+
+Additional coverage checks genuine inactivity and expiry, unchanged session IDs, completion, invalid/future/out-of-order timestamps, and activity ordering when the display limit is reached. No transcript contents or machine-specific paths are included in the fixtures. Existing replay-size and 200-file candidate limits remain; candidate selection still uses filesystem modification time.
+
+The locally installed corrected viewer displayed the ongoing native task as active. This is a live root-session observation, not a new multi-agent run. For this correction, all 17 Codex parser/server tests, backend/core TypeScript checks, the production build (including frontend TypeScript), and git diff --check passed on Windows. The existing bundle-size advisory remains non-fatal. Historical frontend and browser runs below are separate evidence, not reruns of those suites for this patch.
+
 ## Publication verification: temple, localization and eight appearances
 
 The final local checkout passed 13 Codex parser/server tests, 195 retained frontend tests in 20 files, all four Chromium integration scenarios, backend/core and frontend TypeScript checks, changed-file ESLint, the production build and `git diff --check`. The existing bundle-size advisory is non-fatal. Browser fixtures cover all eight appearances in the actual hall, their work/rest transitions and the separate character gallery.

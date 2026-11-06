@@ -153,3 +153,78 @@ test('internal approval sessions are excluded; top-level parent metadata is supp
     sessions.find((s) => s.sessionId === 'root').id,
   );
 });
+
+test('record timestamps discover live Windows logs despite an old file modification time', async (t) => {
+  const { file, monitor } = await fixture(t);
+  const now = Date.now();
+  const old = new Date(now - 120 * 60_000);
+  await writeFile(
+    file,
+    lines(meta(), { ...call('function_call'), timestamp: new Date(now).toISOString() }),
+  );
+  await utimes(file, old, old);
+  assert.equal((await monitor.poll(now))[0].status, 'active');
+  assert.equal((await monitor.poll(now + 6 * 60_000))[0].status, 'stale');
+  assert.deepEqual(await monitor.poll(now + 61 * 60_000), []);
+});
+
+test('incremental log records stay live with a frozen Windows modification time', async (t) => {
+  const { file, monitor } = await fixture(t);
+  const now = Date.now();
+  const old = new Date(now - 10 * 60_000);
+  await writeFile(file, lines(meta(), { ...event('task_started'), timestamp: old.toISOString() }));
+  await utimes(file, old, old);
+  const first = (await monitor.poll(now))[0];
+  assert.equal(first.status, 'stale');
+  await appendFile(
+    file,
+    lines({ ...call('custom_tool_call'), timestamp: new Date(now).toISOString() }),
+  );
+  await utimes(file, old, old);
+  const active = (await monitor.poll(now))[0];
+  assert.equal(active.status, 'active');
+  assert.equal(active.id, first.id);
+  await appendFile(
+    file,
+    lines({ ...event('task_complete'), timestamp: new Date(now).toISOString() }),
+  );
+  await utimes(file, old, old);
+  assert.equal((await monitor.poll(now))[0].status, 'idle');
+});
+
+test('invalid, future and out-of-order timestamps cannot extend recorded activity', () => {
+  const state = newSession();
+  const now = Date.now();
+  for (const timestamp of [null, 42, 'not-a-timestamp', new Date(now + 86400_000).toISOString()]) {
+    reduceRecord(state, { ...event('task_started'), timestamp });
+  }
+  assert.equal(state.lastActivityMs, 0);
+  reduceRecord(state, { ...call('function_call'), timestamp: new Date(now - 1000).toISOString() });
+  reduceRecord(state, { ...event('task_started'), timestamp: new Date(now - 2000).toISOString() });
+  reduceRecord(state, { ...rec('unrecognized', {}), timestamp: new Date(now).toISOString() });
+  assert.equal(state.lastActivityMs, now - 1000);
+});
+
+test('display limit prioritizes recorded activity over a delayed Windows modification time', async (t) => {
+  const { dir, file, monitor } = await fixture(t, { maxAgents: 1 });
+  const now = Date.now();
+  const old = new Date(now - 120 * 60_000);
+  await writeFile(
+    file,
+    lines(meta('working'), { ...call('function_call'), timestamp: new Date(now).toISOString() }),
+  );
+  await utimes(file, old, old);
+  const idleFile = path.join(dir, 'idle.jsonl');
+  const idleTime = new Date(now - 60_000);
+  await writeFile(
+    idleFile,
+    lines(meta('idle'), { ...event('task_complete'), timestamp: idleTime.toISOString() }),
+  );
+  await utimes(idleFile, idleTime, idleTime);
+  const sessions = await monitor.poll(now);
+  assert.equal(sessions.length, 1);
+  assert.equal(sessions[0].sessionId, 'working');
+  assert.equal(sessions[0].status, 'active');
+  assert.equal(monitor.ids.size, 1);
+  assert.equal((await monitor.poll(now))[0].id, sessions[0].id);
+});
