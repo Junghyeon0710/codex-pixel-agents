@@ -16,7 +16,7 @@ The native session ID is hashed into the eight-appearance catalog. Work/rest cha
 - `node codex/temple-atlas.mjs` validates true transparency and 12 nonempty, padded frame bounds per atlas, then regenerates metadata without altering any image.
 - Rendering uses each atlas's own frame bounds and one fixed character scale. Bowing is not stretched to standing height.
 
-![Eight appearances in the viewer gallery](temple-characters.png)
+![Eight appearances in the viewer gallery](temple-characters-en.png)
 
 ## Generation prompts
 

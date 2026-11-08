@@ -45,7 +45,7 @@ English is the default; select **한국어** for Korean controls, statuses and k
 Your language choice is saved in this browser when local storage is available and survives refreshes.
 Model, tool, project and custom role identifiers keep their original names. These controls only change the viewer.
 
-![Eight temple character appearances](docs/codex/temple-characters.png)
+![Eight temple character appearances](docs/codex/temple-characters-en.png)
 _Appearance gallery; these previews are not extra live agents. Real sessions use these same sprite atlases in the hall._
 
 No npm package or VS Code Marketplace extension has been published for this fork. The commands above run the checked-out source. Original VS Code/Claude integration source remains for reference; `npm start` runs the new Codex-only viewer.

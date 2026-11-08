@@ -171,6 +171,8 @@ test('eight character previews show real atlases and localized poses', async ({ 
   expect(new Set(files).size).toBe(8);
   for (const file of files)
     expect((await page.request.get(new URL(file, url).href)).ok()).toBe(true);
+  await expect(gallery).toContainText('Indigo silver hair');
+  await page.screenshot({ path: 'docs/codex/temple-characters-en.png' });
   await page.getByLabel('Preview pose', { exact: true }).selectOption('4');
   await expect(gallery.locator('figure[data-pose="4"]')).toHaveCount(8);
   await page.getByLabel('Preview pose', { exact: true }).selectOption('11');
